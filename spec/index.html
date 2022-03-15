@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <!-- pandoc template based on mdBook theme -->
+    <meta charset="utf-8" />
+    <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="author" content="Martin Jäger" />
+    <meta name="dcterms.date" content="2022-03-15" />
+    <meta name="keywords" content="Markdown, Example" />
+    <title>Technical Specification – BMS 16S100 SC</title>
+
+    <link rel="shortcut icon" href="template/favicon.ico">
+    <link rel="stylesheet" href="template/screen.css" />
+    <link rel="stylesheet" href="template/print.css" media="print">
+    <style>
+        code{white-space: pre-wrap;}
+        span.smallcaps{font-variant: small-caps;}
+        span.underline{text-decoration: underline;}
+        div.column{display: inline-block; vertical-align: top; width: 50%;}
+    </style>
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="template/fontawesome/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+</head>
+<body class="light">
+
+
+    <!-- Provide site root to javascript -->
+    <script type="text/javascript">
+        var path_to_root = "";
+        var default_theme = "light";
+    </script>
+
+    <!-- Work around some values being stored in localStorage wrapped in quotes -->
+    <script type="text/javascript">
+        try {
+            var theme = localStorage.getItem('mdbook-theme');
+            var sidebar = localStorage.getItem('mdbook-sidebar');
+
+            if (theme.startsWith('"') && theme.endsWith('"')) {
+                localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+            }
+
+            if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+            }
+        } catch (e) { }
+    </script>
+
+    <!-- Set the theme before any content is loaded, prevents flash -->
+    <script type="text/javascript">
+        var theme;
+        try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+        if (theme === null || theme === undefined) { theme = default_theme; }
+        document.body.className = theme;
+        document.querySelector('html').className = theme + ' js';
+    </script>
+
+    <!-- Hide / unhide sidebar before it is displayed -->
+    <script type="text/javascript">
+        var html = document.querySelector('html');
+        var sidebar = 'hidden';
+        if (document.body.clientWidth >= 1080) {
+            try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+            sidebar = sidebar || 'visible';
+        }
+        html.classList.remove('sidebar-visible');
+        html.classList.add("sidebar-" + sidebar);
+    </script>
+
+    <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+        <div class="toc">
+            <ul>
+            <li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a>
+            <ul>
+            <li><a href="#project-background"><span class="toc-section-number">1.1</span> Project background</a></li>
+            <li><a href="#system-overview"><span class="toc-section-number">1.2</span> System overview</a></li>
+            <li><a href="#disclaimer"><span class="toc-section-number">1.3</span> Disclaimer</a></li>
+            <li><a href="#license"><span class="toc-section-number">1.4</span> License</a></li>
+            </ul></li>
+            <li><a href="#system-description"><span class="toc-section-number">2</span> System Description</a>
+            <ul>
+            <li><a href="#bms-topology"><span class="toc-section-number">2.1</span> BMS topology</a>
+            <ul>
+            <li><a href="#considered-alternatives"><span class="toc-section-number">2.1.1</span> Considered alternatives</a></li>
+            </ul></li>
+            <li><a href="#system-integration"><span class="toc-section-number">2.2</span> System integration</a></li>
+            <li><a href="#external-interfaces"><span class="toc-section-number">2.3</span> External interfaces</a></li>
+            </ul></li>
+            <li><a href="#requirements"><span class="toc-section-number">3</span> Requirements</a>
+            <ul>
+            <li><a href="#mechanical-design"><span class="toc-section-number">3.1</span> Mechanical Design</a>
+            <ul>
+            <li><a href="#outside-dimensions-and-shape"><span class="toc-section-number">3.1.1</span> Outside dimensions and shape</a></li>
+            </ul></li>
+            <li><a href="#electronics-hardware"><span class="toc-section-number">3.2</span> Electronics Hardware</a>
+            <ul>
+            <li><a href="#board-split"><span class="toc-section-number">3.2.1</span> Board split</a></li>
+            <li><a href="#mcu-selection"><span class="toc-section-number">3.2.2</span> MCU selection</a></li>
+            <li><a href="#asic-selection"><span class="toc-section-number">3.2.3</span> ASIC selection</a></li>
+            <li><a href="#balancing"><span class="toc-section-number">3.2.4</span> Balancing</a></li>
+            <li><a href="#protective-switches"><span class="toc-section-number">3.2.5</span> Protective switches</a></li>
+            <li><a href="#current-measurement"><span class="toc-section-number">3.2.6</span> Current measurement</a></li>
+            <li><a href="#cell-and-thermistor-connectors"><span class="toc-section-number">3.2.7</span> Cell and thermistor connectors</a></li>
+            <li><a href="#power-connectors"><span class="toc-section-number">3.2.8</span> Power connectors</a></li>
+            <li><a href="#power-pcb-specifications"><span class="toc-section-number">3.2.9</span> Power PCB specifications</a></li>
+            <li><a href="#communication-interfaces"><span class="toc-section-number">3.2.10</span> Communication interfaces</a></li>
+            </ul></li>
+            <li><a href="#firmware-features"><span class="toc-section-number">3.3</span> Firmware Features</a></li>
+            </ul></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="page-wrapper" class="page-wrapper">
+
+        <div class="page">
+
+            <div id="menu-bar" class="menu-bar">
+                <div id="menu-bar-sticky-container">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">BMS 16S100 SC</h1>
+
+                    <div class="right-buttons">
+                        <a onclick="window.print()" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fas fa-print"></i>
+                        </a>
+                        <a href="spec.pdf" title="View PDF file" aria-label="View PDF file">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                        </div>
+                </div>
+            </div>
+
+
+            <div id="content" class="content">
+                <main>
+<h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
+<p>This technical specification describes the functions and requirements for a flexible open-source Battery Management System (BMS) suitable for various applications.</p>
+<h2 data-number="1.1" id="project-background"><span class="header-section-number">1.1</span> Project background</h2>
+<p>The main target of the project behind this BMS is to provide a solid technical basis for custom developments of organizations working in the energy access sector.</p>
+<p>The project is funded by the <a href="https://enaccess.org/">EnAccess Foundation</a>.</p>
+<p><img src="./images/enaccess-logo-centered.png" /></p>
+<p>The development is driven by the Libre Solar and EnAccess Communities. Visit the following websites for most recent updates:</p>
+<ul>
+<li><p>EnAccess Community: <a href="https://community.enaccess.org/">community.enaccess.org</a></p></li>
+<li><p>Libre Solar Community: <a href="https://talk.libre.solar/">talk.libre.solar</a></p></li>
+</ul>
+<p>Hardware and firmware source files are published on GitHub:</p>
+<ul>
+<li><p>Hardware Repository: <a href="https://github.com/LibreSolar/bms-16s100-sc">github.com/LibreSolar/bms-16s100-sc</a></p></li>
+<li><p>Firmware Repository: <a href="https://github.com/LibreSolar/bms-firmware">github.com/LibreSolar/bms-firmware</a></p></li>
+</ul>
+<h2 data-number="1.2" id="system-overview"><span class="header-section-number">1.2</span> System overview</h2>
+<p>The BMS is the heart of every Li-ion battery. It is needed to equalize series connected cells and protect the battery from current, voltages and temperatures outside the allowed operating range.</p>
+<p>Below figure shows a complete battery system with the integrated BMS. The BMS electronics are split into two separate boards, one for signal processing and control, the other one for high currents (power board).</p>
+<figure>
+<img src="./images/bms-overview.svg" alt="Overview of the BMS integrated into a Li-ion battery pack." /><figcaption aria-hidden="true">Overview of the BMS integrated into a Li-ion battery pack.</figcaption>
+</figure>
+<p>This BMS will have the following high-level features:</p>
+<ul>
+<li>Flexible and fully open-source design</li>
+<li>Suitable for 12V, 24V or 48V systems (up to 16 cells in series)</li>
+<li>Continuous currents of up to 100A</li>
+</ul>
+<p>With above specifications it will be suitable for for the following applications:</p>
+<ul>
+<li>Poductive use appliances like milling machines</li>
+<li>Energy storage for AC mini-grid applications with up to 4 kVA inverters</li>
+<li>Second-life batteries built e.g. from recycled EV batteries</li>
+</ul>
+<h2 data-number="1.3" id="disclaimer"><span class="header-section-number">1.3</span> Disclaimer</h2>
+<p>This specification has been written and checked with care and to the best of our knowledge.</p>
+<p>Libre Solar assumes no liability for the accuracy, completeness or quality of the information provided. Liability claims against the team for material, physical or immaterial damages caused by the use or non-use of the information provided or by the use of incorrect and/or incomplete information are excluded.</p>
+<p>All information and instructions are non-binding. Libre Solar reserves the right to change, supplement or delete parts of the pages or the entire document without prior notice.</p>
+<h2 data-number="1.4" id="license"><span class="header-section-number">1.4</span> License</h2>
+<p>This specification document is licensed under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) License.</p>
+<p><img src="./images/cc-by-sa-centered.png" /></p>
+<p>The full license text is available at <a href="https://creativecommons.org/licenses/by-sa/4.0/">https://creativecommons.org/licenses/by-sa/4.0/</a>.</p>
+<h1 data-number="2" id="system-description"><span class="header-section-number">2</span> System Description</h1>
+<p>This chapter gives a high-level introduction into the battery management system that is going to be developed within this project.</p>
+<h2 data-number="2.1" id="bms-topology"><span class="header-section-number">2.1</span> BMS topology</h2>
+<p>The BMS will follow the centralized topology approach where a single unit includes pack-level and cell-level measurement and protection functions.</p>
+<p>A schematic diagram of the centralized topology is shown in below figure.</p>
+<figure>
+<img src="./images/bms_centralized.svg" alt="Centralized BMS topology." /><figcaption aria-hidden="true">Centralized BMS topology.</figcaption>
+</figure>
+<p>This topology was chosen because it provides the cheapest and most simple solution for the number of cells required for a pack voltage of up to 48 V nominal.</p>
+<h3 data-number="2.1.1" id="considered-alternatives"><span class="header-section-number">2.1.1</span> Considered alternatives</h3>
+<p>Alternative distributed and modular BMS topologies are further described on <a href="https://learn.libre.solar/system/bms.html">learn.libre.solar</a>.</p>
+<p>For up to 16s cells a modular topology is not required. Separating the main BMS control board from the module controller would only increase cost and complexity because of the galvanically isolated communication. A modular BMS makes most sense for high-voltage batteries (e.g. in electric vehicles) beyond 48 V.</p>
+<p>The distributed topology is not considered feasible either, as it requires a single PCB with a dedicated microcontroller or ASIC for each cell. While this approach might work for comparably large cells, smaller battery packs would not have enough space to fit these PCBs. In addition to that, one single centralized board is considered more cost-effective.</p>
+<h2 data-number="2.2" id="system-integration"><span class="header-section-number">2.2</span> System integration</h2>
+<p>The BMS boards will be integrated into a battery system with its own enclosure. It will have a plastic enclosure to protect the circuit during assembly (e.g. against short circuits by tools) and to allow fixation inside the battery together with a heat sink.</p>
+<h2 data-number="2.3" id="external-interfaces"><span class="header-section-number">2.3</span> External interfaces</h2>
+<p>The BMS will contain communiation interfaces for monitoring, control and higher-level energy management.</p>
+<p>For fast control tasks between different devices in an energy system (e.g. multiple batteries in parallel), a CAN bus will be used.</p>
+<p>In order to implement remote monitoring and PAYG business models, the BMS can be extended with radio communication, e.g. via GSM or LoRa. The microcontroller will be powerful enough to extend the firmware depending on individual needs. The hardware will provide extension ports to allow communication with the microcontroller, as described below in further detail.</p>
+<h1 data-number="3" id="requirements"><span class="header-section-number">3</span> Requirements</h1>
+<h2 data-number="3.1" id="mechanical-design"><span class="header-section-number">3.1</span> Mechanical Design</h2>
+<p>As the BMS boards will be integrated into a battery system with its own enclosure, it does not require a fully protected enclosure itself.</p>
+<p>The BMS plastic enclosure must protect the circuit during assembly (e.g. against short circuits by tools) and to allow fixation inside the battery.</p>
+<p>The MOSFET switches require cooling through an aluminum heat sink, which will be integrated into the design.</p>
+<p>Wires of up to 35 mm² cross-section must be supported by the terminals.</p>
+<h3 data-number="3.1.1" id="outside-dimensions-and-shape"><span class="header-section-number">3.1.1</span> Outside dimensions and shape</h3>
+<p>The height is the same as typical 18650 cells so that it can be easily integrated into existing housings.</p>
+<figure>
+<img src="./images/bms-top-view.png" alt="BMS top view complete (DRAFT)" /><figcaption aria-hidden="true">BMS top view complete (DRAFT)</figcaption>
+</figure>
+<figure>
+<img src="./images/bms-top-view-power.png" alt="BMS top view power part (DRAFT)" /><figcaption aria-hidden="true">BMS top view power part (DRAFT)</figcaption>
+</figure>
+<figure>
+<img src="./images/bms-front-view.png" alt="BMS front view (DRAFT)" /><figcaption aria-hidden="true">BMS front view (DRAFT)</figcaption>
+</figure>
+<p>The larger cell depicted at the left side is a 2170-type cell, which has a height of 70 mm instead of 65 mm.</p>
+<h2 data-number="3.2" id="electronics-hardware"><span class="header-section-number">3.2</span> Electronics Hardware</h2>
+<h3 data-number="3.2.1" id="board-split"><span class="header-section-number">3.2.1</span> Board split</h3>
+<p>The electronics circuits should be split into 3 parts:</p>
+<ul>
+<li>Control PCB
+<ul>
+<li>Microcontroller</li>
+<li>BMS ASIC</li>
+<li>Internal power supply</li>
+<li>Communication interfaces (CAN and UEXT)</li>
+</ul></li>
+<li>Power PCB
+<ul>
+<li>High current terminals</li>
+<li>MOSFETs (approx. 10 in parallel)</li>
+<li>Current measurement shunt</li>
+</ul></li>
+<li>Active Balancing PCB (optional, not part of this project)
+<ul>
+<li>Circuitry required for active balancing</li>
+<li>Potentially additional microcontroller</li>
+</ul></li>
+</ul>
+<h3 data-number="3.2.2" id="mcu-selection"><span class="header-section-number">3.2.2</span> MCU selection</h3>
+<p>It is planned to support two different MCUs on the board in order to avoid chip supply shortage problems. The main MCU will be from the STM32G0B1 series. The alternative will be from the ESP32 series.</p>
+<p>As the available space for the MCUs is very tight, the alternative MCU may have to be mounted to the bottom side of the PCB, even though all other parts can hopefully be placed from a single side only.</p>
+<p>The STM32 series is very well supported by Zephyr RTOS. For the ESP32 series, some peripherals like CAN bus don’t work out of the box, yet, as the drivers are not yet ported. The support for ESP32 is expected to improve significantly till the end of the project.</p>
+<h4 data-number="3.2.2.1" id="considered-alternatives-1"><span class="header-section-number">3.2.2.1</span> Considered alternatives</h4>
+<p>Nordic nRF52840, but does not have CAN and WiFi compared to ESP32.</p>
+<h3 data-number="3.2.3" id="asic-selection"><span class="header-section-number">3.2.3</span> ASIC selection</h3>
+<p>Texas Instruments <strong>bq76952</strong></p>
+<p><strong>Pro:</strong> Good compromise between accuracy, features and cost.</p>
+<p>Features according to Datasheet:</p>
+<ul>
+<li>Battery monitoring capability for 3-series to 16-series cells</li>
+<li>Integrated charge pump for high-side NFET protection with optional autonomous recovery</li>
+<li>Extensive protection suite including voltage, temperature, current, and internal diagnostics</li>
+<li>Two independent ADCs</li>
+<li>Support for simultaneous current and voltage sampling</li>
+<li>High-accuracy coulomb counter with input offset error &lt; 1 uV (typical)</li>
+<li>High accuracy cell voltage measurement &lt; 10 mV (typical)</li>
+<li>Wide-range current applications (±200-mV measurement range across sense resistor)</li>
+<li>Integrated secondary chemical fuse drive protection</li>
+<li>Autonomous or host-controlled cell balancing</li>
+<li>Multiple power modes (typical battery pack operating range conditions)</li>
+<li>NORMAL mode: 286 uA</li>
+<li>Multiple SLEEP mode options: 24 uA to 41 uA</li>
+<li>Multiple DEEPSLEEP mode options: 9 uA to 10 uA</li>
+<li>SHUTDOWN mode: 1 uA</li>
+<li>High-voltage tolerance of 85 V on cell connect and select additional pins</li>
+<li>Tolerant of random cell attach sequence on production line</li>
+<li>Support for temperature sensing using internal sensor and up to nine external thermistors</li>
+<li>Integrated one-time-programmable (OTP) memory programmable by customers on production line</li>
+<li>Communication options include 400-kHz I2C, SPI, and HDQ one-wire interface</li>
+<li>Dual-programmable LDOs for external system usage</li>
+<li>48-pin TQFP package (PFB)</li>
+</ul>
+<h4 data-number="3.2.3.1" id="considered-alternatives-2"><span class="header-section-number">3.2.3.1</span> Considered alternatives</h4>
+<p>Analog Devices <strong>ADBMS1818</strong> (compatible to LTC68xx series)</p>
+<p><strong>Cons:</strong></p>
+<ul>
+<li>Significantly more expensive than bq76952 (approx. 3 times more)</li>
+<li>No integrated pack-level protection (intended for modular high-voltage BMS)</li>
+</ul>
+<p>Features according to Datasheet:</p>
+<ul>
+<li>Measures up to 18 battery cells in series</li>
+<li>3.0 mV maximum total measurement error</li>
+<li>Stackable architecture for high voltage systems Built-in isoSPI™ interface</li>
+<li>1 Mb isolated serial communications</li>
+<li>Uses a single twisted pair, up to 100 meters</li>
+<li>Low EMI susceptibility and emissions</li>
+<li>Bidirectional for broken wire protection</li>
+<li>290 us to measure all cells in a system</li>
+<li>Synchronized voltage and current measurement</li>
+<li>16-bit delta-sigma ADC with programmable third-order noise filter</li>
+<li>Passive cell balancing up to 200 mA (maximum) with programmable pulse‑width modulation</li>
+<li>9 general purpose digital I/O or analog inputs</li>
+<li>Temperature or other sensor inputs</li>
+<li>Configurable as an I2C or SPI master</li>
+<li>6 uA sleep mode supply current</li>
+<li>64-lead eLQFP package</li>
+</ul>
+<h3 data-number="3.2.4" id="balancing"><span class="header-section-number">3.2.4</span> Balancing</h3>
+<p>The BMS shall have passive balancing with the maximum current supported by the ASIC.</p>
+<p>An additional pin header with connections to each cell will be provided so that an additional board containing active balancing circuitry can be added in the future. In addition to that, an I2C bus will be exposed to the pin header for potential communication between the main MCU and a “smart” active balancing board.</p>
+<h4 data-number="3.2.4.1" id="considered-alternatives-3"><span class="header-section-number">3.2.4.1</span> Considered alternatives</h4>
+<p>The below mentioned active balancing solutions were considered, but not actually implemented in the design.</p>
+<p>For a good overview of different balancing technologies the paper <a href="https://www.researchgate.net/publication/231169729_A_Review_of_Passive_and_Active_Battery_Balancing_based_on_MATLABSimulink">A Review of Passive and Active Battery Balancing based on MATLAB/Simulink by M. Daowd et al.</a> is highly recommended.</p>
+<p>Solutions based on the ETA3000 or a switched capacitor are potentially very cheap options. However, the required components are currently not readily available. Solutions based on ICs of well-known manufacturers like Texas Instruments and Analog Devices / Linear Technologies are very expensive and for this reason not considered to be included by default in this BMS targeting cost-sensitive applications.</p>
+<h5 data-number="3.2.4.1.1" id="eta3000"><span class="header-section-number">3.2.4.1.1</span> ETA3000</h5>
+<p>The ETA3000 is an integrated circuit that implements switched inductor balancing with up to 2A. A 16s pack requires 15 ETA3000 chips, 15 inductors and a few additional resistors and MLCCs.</p>
+<p>Each chip measures the voltage of two adjacent cells and moves charge from the cell with higher cell voltage to the one with lower voltage. The balancing starts at voltage differences of more than 100 mV and stops at around 30 mV. This makes it a potentially suitable companion to the passive balancing provided by the bq75952. The chip does not need any communication with the microcontroller.</p>
+<p>A disadvantage of this solution is that tolerances in each chip add up, so that the actual difference between the lowest and highest cell can be more than 30 mV for a large number of series connected cells.</p>
+<p>This chip is used in multiple active balancers sold on Aliexpress, but it does not seem to be available on the general market. It is not listed by any of the US distributors or LCSC, for example.</p>
+<p>See also <a href="https://www.beyondlogic.org/review-li-ion-lipo-lifepo4-lithium-battery-active-equalizer-balancer-energy-transfer-board/">this blog post</a> for further details.</p>
+<h5 data-number="3.2.4.1.2" id="switched-capacitor"><span class="header-section-number">3.2.4.1.2</span> Switched capacitor</h5>
+<p>Similar to the ETA3000 chip, energy can also be transferred between two cells using switched capacitors instead of an inductor. This principle is used by other popular active balancers available on Aliexpress, e.g. by the manufacturer <a href="https://heltec-bms.com/products/active-balancer/">Heltec BMS</a>.</p>
+<p>Unfortunately, the used chips (SOIC-8 package) in those BMSs do not have any marking. No suitable chip made by well-known manufacturers was found during the research for this project.</p>
+<h5 data-number="3.2.4.1.3" id="analog-devices-ltc3300-1"><span class="header-section-number">3.2.4.1.3</span> Analog Devices LTC3300-1</h5>
+<p>One chip can balance up to 6 series-connected cells, which means that 3 chips are needed for the 16s pack.</p>
+<p>The lowest price per chip from distributors is around $7.50 for an order of 1000 pcs (as of 11/2021).</p>
+<h5 data-number="3.2.4.1.4" id="texas-instruments-emb1428q"><span class="header-section-number">3.2.4.1.4</span> Texas Instruments EMB1428Q</h5>
+<p>The lowest price per chip from distributors is around $9.50 for an order of 1000 pcs (as of 11/2021).</p>
+<h3 data-number="3.2.5" id="protective-switches"><span class="header-section-number">3.2.5</span> Protective switches</h3>
+<p>The positive battery terminal can be disconnected by the BMS for safety reasons or upon demand of the user via a communicatoin interface.</p>
+<p>The disconnect switch will be built using N-channel MOSFETs a back-to-back configuration to be able to interrupt current in both directions (see also bq76952 datasheet). In order to allow the high currents, multiple MOSFETs will be connected in parallel.</p>
+<p>The power PCB can be attached to a heat sink to dissipate the heat at high continuous currents.</p>
+<p>Suggested MOSFETs: IPT015N10N5. Rds(on) at 80°C is max. 2 mOhm, leading to a total of 1 mOhm (4p2s) and 10W of heat dissipation at 100A.</p>
+<p>There are cheaper alternatives with higher Rds(on), also from other manufacturers.</p>
+<h4 data-number="3.2.5.1" id="considered-alternatives-4"><span class="header-section-number">3.2.5.1</span> Considered alternatives</h4>
+<p>A different option for the disconnect switch would be the use of contactors. However, they are usually more expensive and require more space. 48V and 100A is still considered feasible with MOSFETs.</p>
+<h3 data-number="3.2.6" id="current-measurement"><span class="header-section-number">3.2.6</span> Current measurement</h3>
+<p>The current will be measured using a shunt, located in the negative voltage path of the battery pack. The shunt voltage will be amplified by the bq76952 ASIC and read by the MCU.</p>
+<p>Time-critical safety features like overcurrent and short circuit protection are implemented directly in the ASIC and can be calibrated via firmware.</p>
+<p>Suggested part: KOA Speer PSJ2NTEBL500F or Bourns CSS2H-3920R-L500F</p>
+<p>The SMD shunt will be soldered directly to the power PCB, as close as possible to the copper bus bars for the high current connectors.</p>
+<h4 data-number="3.2.6.1" id="considered-alternatives-5"><span class="header-section-number">3.2.6.1</span> Considered alternatives</h4>
+<p>The shunt resistor could be placed outside the BMS with the two measurement wires connected to the BMS for reading the shunt voltage. This solution is currently not considered, as it requires more space and is more susceptible to noise because of a longer measurement wire.</p>
+<h3 data-number="3.2.7" id="cell-and-thermistor-connectors"><span class="header-section-number">3.2.7</span> Cell and thermistor connectors</h3>
+<p>The cells will be connected to the BMS control PCB using <a href="https://www.molex.com/molex/products/family/microfit_30">Molex Micro-Fit</a> or <a href="https://www.we-online.com/katalog/en/em/connectors/wire-to-board/wr_mpc3">Würth WR-MPC3</a> series connectors, as shown in the following image.</p>
+<figure>
+<img src="./images/wr-mpc3.png" alt="Würth WR-MPC3 connector series (Source: Würth)" /><figcaption aria-hidden="true">Würth WR-MPC3 connector series (Source: Würth)</figcaption>
+</figure>
+<p>Both series are pin-compatible and there are even more compatible connectors in the market for this popular series. The connectors can handle up to 5A, which is sufficient even for active balancing.</p>
+<h4 data-number="3.2.7.1" id="considered-alternatives-6"><span class="header-section-number">3.2.7.1</span> Considered alternatives</h4>
+<p>BMS boards available on eBay or AliExpress often use connectors similar to JST PH or XH series. However, these connectors are only suitable for lower balancing currents and the quality of cables and connectors on eBay is not reproducible. Above mentioned connectors from Molex or Würth are considered more reliable.</p>
+<h3 data-number="3.2.8" id="power-connectors"><span class="header-section-number">3.2.8</span> Power connectors</h3>
+<p>The BMS will be designed for up to 100A continuous current. As the MOSFETs are soldered to the power PCB, the current has to go through the PCB. The connection from wire to board is critical and must handle the required current reliably.</p>
+<p>High-current wire-to-board connectors are rather expensive. As a good compromise regarding price, flexibility and packaging volume this BMS uses a custom-made (yet simple) copper bus bar of e.g. 2 mm thickness with a clinch nut pressed in from the back. The bus bar will be soldered directly onto the PCB and can spread the current as well as heat.</p>
+<p>The <a href="https://www.kvt-fastening.de/en/products/brands/pem/">KVT PEM</a> clinch nut (CLS type) is currently planned.</p>
+<h4 data-number="3.2.8.1" id="considered-alternatives-7"><span class="header-section-number">3.2.8.1</span> Considered Alternatives</h4>
+<p>Two 9x9 mm Würth WP-BUCF press-fit terminals in parallel, each handling 50 A. The wire can be connected using crimped ring terminals and M5 screws.</p>
+<p>The following image shows an example of the terminals.</p>
+<figure>
+<img src="./images/wp-bucf.png" alt="Würth WP-BUCF press-fit terminals (Source: Würth)" /><figcaption aria-hidden="true">Würth WP-BUCF press-fit terminals (Source: Würth)</figcaption>
+</figure>
+<p>The terminals require an additional assembly step after soldering. However, similar connectors with through-hole reflow assembly methods have proven to be very difficult to solder together with smaller components on the same PCB because auf their high thermal mass. It makes sense to add the terminals in a separate step.</p>
+<p>As the cheapest solution, the terminals can be omitted and the wires can be soldered directly to the PCB. This solution is not considered as reliable, especially if the board can be exposed to vibrations.</p>
+<p>The press-fit terminals were the first idea, but were dropped because the custom busbar with clinch nut is considered cheaper and more suitable for the application.</p>
+<h3 data-number="3.2.9" id="power-pcb-specifications"><span class="header-section-number">3.2.9</span> Power PCB specifications</h3>
+<p>The current plan is to manufacture the power PCB (for 100A) as a 4-layer PCB with outer layers of 105 µm copper thickness. Technologies like thick copper inlays should be avoided in order to reduce cost, if possible.</p>
+<p>Whether 105 µm copper is sufficient is yet to be tested with first prototypes.</p>
+<h3 data-number="3.2.10" id="communication-interfaces"><span class="header-section-number">3.2.10</span> Communication interfaces</h3>
+<p>One major advantage of an open source design is its extensibility and adaptation to specific requirements.</p>
+<p>In order to provide the hardware interfaces required to add custom extensions, two options are offered. Communication between multiple BMSs or other devices like charge controllers can be achieved via CAN bus, while the UEXT connector allows to add communication modules (e.g. GSM, LoRa) that directly inteface with the MCU’s I2C, SPI or UART peripherals.</p>
+<h4 data-number="3.2.10.1" id="can-bus"><span class="header-section-number">3.2.10.1</span> CAN bus</h4>
+<p>The board will have another Molex MicroFit type connector with pins for CANH and CANL.</p>
+<p>Other Libre Solar devices usually have a standard RJ45 jack on the board. However, the RJ45 jack must be accessible from the outside of the battery pack to connect multiple packs with each other. As the BMS PCB can be located anywhere in the battery pack housing, having the connectors directly on the BMS PCB does not make. The MicroFit provides flexibility to make custom adapters to connect CAN with the outside world.</p>
+<h4 data-number="3.2.10.2" id="uext-connector"><span class="header-section-number">3.2.10.2</span> UEXT connector</h4>
+<p>The Universal Extension Connector is a 10-pin connector featuring most important microcontroller interfaces I2C, UART and SPI. With the integrated 3V3 power supply, it can be used to connect different communication modules to a given device.</p>
+<figure>
+<img src="./images/uext_pins.jpg" alt="UEXT connector pinout (Source: Wikipedia)" /><figcaption aria-hidden="true">UEXT connector pinout (Source: Wikipedia)</figcaption>
+</figure>
+<p>All Libre Solar devices are equipped with a UEXT connector.</p>
+<p>Several UEXT modules are available at <a href="https://www.olimex.com/Products/Modules/UEXT/">Olimex</a>, the inventor of the UEXT standard.</p>
+<h2 data-number="3.3" id="firmware-features"><span class="header-section-number">3.3</span> Firmware Features</h2>
+<p>The firmware for the BMS will be developed based on existing <a href="https://github.com/LibreSolar/bms-firmware">Libre Solar BMS firmware</a>, which supports only BMS ASICs with lower cell count at the time of starting this project.</p>
+<p>The firmware is based on <a href="https://www.zephyrproject.org/">Zephyr RTOS</a> and thus allows for easy integration of additional communication features. The latest Zephyr long-term support release is in the process of being certified for functional safety according to IEC 61508.</p>
+<p>Amongst all features inherited from underlying Zephyr, the BMS firmware will have the additional BMS-specific features:</p>
+<ul>
+<li>Monitoring and configuration using the <a href="https://thingset.io/">ThingSet</a> protocol (mapping to MQTT, CoAP and HTTP possible)
+<ul>
+<li>Serial interface</li>
+<li>CAN bus</li>
+</ul></li>
+<li>Extensions via <a href="https://en.wikipedia.org/wiki/UEXT">UEXT connector</a> possible
+<ul>
+<li>I2C</li>
+<li>SPI</li>
+<li>UART</li>
+</ul></li>
+<li>SOC estimation based on coulomb counting</li>
+<li>Configuration options
+<ul>
+<li>Pack layout
+<ul>
+<li>Cell chemistry (LiFePO4, NMC, NCA)</li>
+<li>Nominal capacity</li>
+<li>Number of cells</li>
+<li>Thermistor type</li>
+<li>Shunt resistor</li>
+<li>Custom open circuit voltage (OCV) look-up table</li>
+</ul></li>
+<li>Protection
+<ul>
+<li>Discharge short circuit limit (A)</li>
+<li>Discharge short circuit delay (us)</li>
+<li>Discharge over-current limit (A)</li>
+<li>Discharge over-current delay (ms)</li>
+<li>Charge over-current limit (A)</li>
+<li>Charge over-current delay (ms)</li>
+<li>Cell target charge voltage (V)</li>
+<li>Cell discharge voltage limit (V)</li>
+<li>Cell over-voltage limit (V)</li>
+<li>Cell over-voltage error reset threshold (V)</li>
+<li>Cell over-voltage delay (ms)</li>
+<li>Cell under-voltage limit (V)</li>
+<li>Cell under-voltage error reset threshold (V)</li>
+<li>Cell under-voltage delay (ms)</li>
+<li>Discharge over-temperature (DOT) limit (°C)</li>
+<li>Discharge under-temperature (DUT) limit (°C)</li>
+<li>Charge over-temperature (COT) limit (°C)</li>
+<li>Charge under-temperature (CUT) limit (°C)</li>
+<li>Temperature limit hysteresis (°C)</li>
+</ul></li>
+<li>Balancing
+<ul>
+<li>Enable automatic balancing.</li>
+<li>Balancing cell voltage target difference (V)</li>
+<li>Minimum cell voltage to start balancing (V)</li>
+<li>Current threshold to be considered idle (A)</li>
+<li>Minimum idle duration before balancing (s)</li>
+</ul></li>
+</ul></li>
+</ul>
+                </main>
+
+                <nav class="nav-wrapper" aria-label="Page navigation">
+                    <!-- Mobile navigation buttons -->
+
+
+
+
+                    <div style="clear: both"></div>
+                </nav>
+            </div>
+        </div>
+
+        <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+        </nav>
+
+    </div>
+
+    <script src="template/book.js" type="text/javascript" charset="utf-8"></script>
+
+</body>
+</html>
